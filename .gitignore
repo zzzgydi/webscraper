@@ -1,0 +1,5 @@
+config/*.yaml
+!config/temp.yaml
+.DS_Store
+output
+*.tar.gz

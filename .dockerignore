@@ -1,0 +1,11 @@
+output/
+web/
+config/dev.yaml
+config/temp.yaml
+
+.git
+.gitignore
+*.md
+
+.DS_Store
+*.tar.gz

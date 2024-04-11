@@ -1,0 +1,6 @@
+http_port: 4090
+http_proxy: ""
+filter:
+  host:
+    - "example.com"
+    - "example2.com"
