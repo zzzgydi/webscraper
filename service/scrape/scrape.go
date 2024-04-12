@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"sync"
 
 	md "github.com/JohannesKaufmann/html-to-markdown"
 	"github.com/PuerkitoBio/goquery"
@@ -16,6 +17,12 @@ import (
 type Scrape struct {
 	rewiseDomain bool
 	pipeline     []func(string) string
+}
+
+type ScrapeResult struct {
+	Url     string `json:"url"`
+	Content string `json:"content"`
+	Error   string `json:"error,omitempty"`
 }
 
 func NewScrape(rewiseDomain bool) *Scrape {
@@ -37,7 +44,6 @@ func (s *Scrape) request(ctx context.Context, rawUrl string) (string, error) {
 	headers := map[string]string{
 		"Accept": "text/html;q=0.9, application/xhtml+xml;q=0.8",
 		// "Accept-Encoding":           "gzip, deflate",
-		// "Accept-Language":           "zh-CN,zh;q=0.9,en;q=0.8",
 		"Cache-Control": "no-cache",
 		"Connection":    "keep-alive",
 		"Pragma":        "no-cache",
@@ -110,4 +116,29 @@ func (s *Scrape) Run(ctx context.Context, rawUrl string) (string, error) {
 	}
 
 	return ret, nil
+}
+
+func (s *Scrape) BatchRun(ctx context.Context, urlList []string) ([]ScrapeResult, error) {
+	res := make([]ScrapeResult, len(urlList))
+
+	var wg sync.WaitGroup
+
+	for idx, url := range urlList {
+		wg.Add(1)
+		go func(idx int, url string) {
+			defer wg.Done()
+
+			res[idx] = ScrapeResult{Url: url}
+			content, err := s.Run(ctx, url)
+			if err != nil {
+				res[idx].Error = err.Error()
+			} else {
+				res[idx].Content = content
+			}
+		}(idx, url)
+	}
+
+	wg.Wait()
+
+	return res, nil
 }

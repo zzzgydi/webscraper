@@ -18,17 +18,11 @@ func PostScrape(c *gin.Context) {
 		return
 	}
 
-	res := make([]ScrapeResult, len(req.UrlList))
 	s := scrape.NewScrape(true)
-
-	for idx, url := range req.UrlList {
-		res[idx] = ScrapeResult{Url: url}
-		content, err := s.Run(c.Request.Context(), url)
-		if err != nil {
-			res[idx].Error = err.Error()
-		} else {
-			res[idx].Content = content
-		}
+	res, err := s.BatchRun(c.Request.Context(), req.UrlList)
+	if err != nil {
+		ReturnServerError(c, err)
+		return
 	}
 
 	ReturnSuccess(c, res)
