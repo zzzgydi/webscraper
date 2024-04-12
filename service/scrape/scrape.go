@@ -119,6 +119,10 @@ func (s *Scrape) Run(ctx context.Context, rawUrl string) (string, error) {
 }
 
 func (s *Scrape) BatchRun(ctx context.Context, urlList []string) ([]ScrapeResult, error) {
+	if len(urlList) == 0 {
+		return nil, fmt.Errorf("url list is empty")
+	}
+
 	res := make([]ScrapeResult, len(urlList))
 
 	var wg sync.WaitGroup
@@ -127,8 +131,15 @@ func (s *Scrape) BatchRun(ctx context.Context, urlList []string) ([]ScrapeResult
 		wg.Add(1)
 		go func(idx int, url string) {
 			defer wg.Done()
-
 			res[idx] = ScrapeResult{Url: url}
+
+			// add recover
+			defer func() {
+				if r := recover(); r != nil {
+					res[idx].Error = fmt.Sprintf("panic: %v", r)
+				}
+			}()
+
 			content, err := s.Run(ctx, url)
 			if err != nil {
 				res[idx].Error = err.Error()
