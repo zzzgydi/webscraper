@@ -1,7 +1,5 @@
 output/
 web/
-config/dev.yaml
-config/temp.yaml
 
 .git
 .gitignore
