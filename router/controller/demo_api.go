@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/zzzgydi/webscraper/router/utils"
 	"github.com/zzzgydi/webscraper/service/scrape"
 )
 
@@ -14,6 +15,11 @@ func GetScrapeHTML(c *gin.Context) {
 	if urlParam == "" {
 		c.Redirect(http.StatusFound, "https://github.com/zzzgydi/webscraper")
 		return
+	}
+
+	trace := utils.GetTraceLogger(c)
+	if trace != nil {
+		trace.Trace("url", urlParam)
 	}
 
 	s := scrape.NewScrape(!noHeadless, true)
