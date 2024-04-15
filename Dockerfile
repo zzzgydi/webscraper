@@ -26,7 +26,7 @@ COPY --from=builder /app/config /app/config
 
 RUN chmod +x /app/webscraper
 
-ENV CONFIG_ENV=dev
+ENV CONFIG_ENV=prod
 
 EXPOSE 4090
 CMD ["./webscraper"]
