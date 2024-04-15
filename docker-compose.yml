@@ -1,0 +1,20 @@
+version: '3.8'
+services:
+  chromedp:
+    image: chromedp/headless-shell
+    ports:
+      - 9222:9222
+    networks:
+      - network1
+  webscraper:
+    build: .
+    ports:
+      - 4090:4090
+    depends_on:
+      - chromedp
+    networks:
+      - network1
+
+networks:
+  network1:
+    driver: bridge
