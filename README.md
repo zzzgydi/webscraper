@@ -8,8 +8,8 @@ To run this project, you need to create a `config/dev.yaml` configuration file. 
 
 Then, use the following command to run the project:
 
-```makefile
-make dev
+```bash
+docker compose up
 ```
 
 ```bash

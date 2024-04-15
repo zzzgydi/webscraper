@@ -13,14 +13,10 @@ RUN mkdir -p output
 RUN CGO_ENABLED=0 go build -tags netgo -ldflags '-extldflags "-static"' -o output/webscraper ./cmd/main.go
 
 
-# run
-# FROM chromedp/headless-shell:latest
 FROM alpine:latest
 
 WORKDIR /app
 
-# RUN apt install tini
-# ENTRYPOINT ["tini", "--"]
 
 RUN mkdir -p /app/log
 
@@ -30,7 +26,7 @@ COPY --from=builder /app/config /app/config
 
 RUN chmod +x /app/webscraper
 
-ENV CONFIG_ENV=prod
+ENV CONFIG_ENV=dev
 
 EXPOSE 4090
 CMD ["./webscraper"]
