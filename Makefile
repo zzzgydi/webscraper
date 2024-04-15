@@ -17,6 +17,7 @@ dev: build
 		cp $(HOMEDIR)/config/temp.yaml $(HOMEDIR)/config/dev.yaml; \
 	fi
 
+	cp -r $(HOMEDIR)/assets  $(OUTDIR)/
 	cp -r $(HOMEDIR)/config  $(OUTDIR)/
 	cp -r $(HOMEDIR)/static  $(OUTDIR)/
 

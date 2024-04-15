@@ -23,6 +23,7 @@ RUN mkdir -p /app/log
 COPY --from=builder /app/output /app
 COPY --from=builder /app/assets /app/assets
 COPY --from=builder /app/config /app/config
+COPY --from=builder /app/static /app/static
 
 RUN chmod +x /app/webscraper
 
