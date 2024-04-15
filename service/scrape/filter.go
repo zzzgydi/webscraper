@@ -1,19 +1,26 @@
 package scrape
 
-import "net/url"
+import (
+	"net/url"
+	"strings"
+
+	"github.com/zzzgydi/webscraper/common/config"
+)
 
 type Filter struct {
-	hostMap map[string]bool
+	hostMap     map[string]bool
+	blockString []string
 }
 
-func NewFilter(host []string) *Filter {
+func NewFilter(conf config.FilterRule) *Filter {
 	hostMap := make(map[string]bool)
-	for _, h := range host {
+	for _, h := range conf.Host {
 		hostMap[h] = true
 	}
 
 	return &Filter{
-		hostMap: hostMap,
+		hostMap:     hostMap,
+		blockString: conf.BlockString,
 	}
 }
 
@@ -29,4 +36,15 @@ func (f *Filter) Pass(urlStr string) bool {
 	}
 
 	return true
+}
+
+func (f *Filter) ContentFilter(content string) string {
+	// remove block string
+	for _, b := range f.blockString {
+		if b != "" {
+			content = strings.Replace(content, b, "", -1)
+		}
+	}
+
+	return content
 }

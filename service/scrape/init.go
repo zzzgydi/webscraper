@@ -37,7 +37,7 @@ func initScrape() error {
 		}
 	}
 
-	filter = NewFilter(config.AppConf.Filter.Host)
+	filter = NewFilter(config.AppConf.Filter)
 
 	return nil
 }

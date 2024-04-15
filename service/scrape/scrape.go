@@ -40,6 +40,8 @@ func (s *Scrape) Run(ctx context.Context, rawUrl string) (*ScrapeResult, error) 
 		return nil, err
 	}
 
+	ret.Content = filter.ContentFilter(ret.Content)
+
 	for _, fn := range s.pipeline {
 		ret.Content = fn(ret.Content)
 	}

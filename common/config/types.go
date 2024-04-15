@@ -8,7 +8,8 @@ type AppConfig struct {
 }
 
 type FilterRule struct {
-	Host []string `yaml:"host"`
+	Host        []string `yaml:"host"`
+	BlockString []string `yaml:"block_string"`
 }
 
 type ChromeSettings struct {
