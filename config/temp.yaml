@@ -4,3 +4,6 @@ filter:
   host:
     - "example.com"
     - "example2.com"
+chrome: # if you are developing on local machine, you can keep these empty
+  remote_url: "" # use websocket url to connect to remote chrome
+  exec_path: "" # otherwise, use local chrome executable path if specified

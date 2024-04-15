@@ -3,9 +3,12 @@ package headless
 import (
 	"context"
 	"fmt"
+	"log/slog"
+	"net/url"
 	"os"
 
 	"github.com/chromedp/chromedp"
+	"github.com/zzzgydi/webscraper/common/config"
 	"github.com/zzzgydi/webscraper/common/initializer"
 )
 
@@ -15,29 +18,42 @@ var (
 )
 
 func initHeadless() error {
-	// options := []chromedp.ExecAllocatorOption{
-	// 	chromedp.Flag("headless", true),
-	// 	chromedp.ExecPath("/headless-shell/headless-shell"),
-	// 	chromedp.Flag("disable-gpu", true),
-	// 	chromedp.Flag("blink-settings", "imagesEnabled=false"),
-	// 	// chromedp.Flag("disable-web-security", true),
-	// }
-	// options = append(chromedp.DefaultExecAllocatorOptions[:], options...)
+	cs := config.AppConf.Chrome
+	if cs.RemoteUrl != "" {
+		slog.Info("use remote chrome", slog.String("url", cs.RemoteUrl))
 
-	// // set http proxy
-	// if config.AppConf.HttpProxy != "" {
-	// 	_, err := url.Parse(config.AppConf.HttpProxy)
-	// 	if err != nil {
-	// 		return err
-	// 	}
+		ctx, _ := chromedp.NewRemoteAllocator(context.Background(), cs.RemoteUrl)
+		allocCtx = ctx
+	} else {
 
-	// 	options = append(options, chromedp.ProxyServer(config.AppConf.HttpProxy))
-	// }
+		options := []chromedp.ExecAllocatorOption{
+			chromedp.Flag("headless", true),
+			chromedp.Flag("disable-gpu", true),
+			chromedp.Flag("blink-settings", "imagesEnabled=false"),
+		}
+		if cs.ExecPath != "" {
+			slog.Info("use local chrome", slog.String("path", cs.ExecPath))
+			options = append(options, chromedp.ExecPath(cs.ExecPath))
+		} else {
+			slog.Info("use default chrome")
+		}
 
-	// ctx, _ := chromedp.NewExecAllocator(context.Background(), options...)
+		options = append(chromedp.DefaultExecAllocatorOptions[:], options...)
 
-	ctx, _ := chromedp.NewRemoteAllocator(context.Background(), "ws://chromedp:9222/")
-	allocCtx = ctx
+		// set http proxy
+		if config.AppConf.HttpProxy != "" {
+			_, err := url.Parse(config.AppConf.HttpProxy)
+			if err != nil {
+				return err
+			}
+
+			slog.Info("use http proxy", slog.String("proxy", config.AppConf.HttpProxy))
+			options = append(options, chromedp.ProxyServer(config.AppConf.HttpProxy))
+		}
+
+		ctx, _ := chromedp.NewExecAllocator(context.Background(), options...)
+		allocCtx = ctx
+	}
 
 	js, err := os.ReadFile("assets/Readability.js")
 	if err != nil {
