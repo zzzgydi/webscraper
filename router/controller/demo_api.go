@@ -22,6 +22,7 @@ func GetScrapeHTML(c *gin.Context) {
 		c.HTML(http.StatusOK, "error.html", gin.H{
 			"error": err.Error(),
 		})
+		return
 	}
 
 	c.HTML(http.StatusOK, "index.html", gin.H{
