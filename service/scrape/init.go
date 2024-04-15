@@ -14,7 +14,7 @@ var (
 	filter       *Filter
 )
 
-func Init() error {
+func initScrape() error {
 	scrapeClient = &http.Client{
 		Timeout: 10 * time.Second,
 		Transport: &http.Transport{
@@ -43,5 +43,5 @@ func Init() error {
 }
 
 func init() {
-	initializer.Register("scrape", Init)
+	initializer.Register("scrape", initScrape)
 }

@@ -11,11 +11,13 @@ import (
 	md "github.com/JohannesKaufmann/html-to-markdown"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/zzzgydi/webscraper/common/utils"
+	hl "github.com/zzzgydi/webscraper/service/headless"
 	"golang.org/x/net/html/charset"
 )
 
 type Scrape struct {
 	rewiseDomain bool
+	headless     bool
 	pipeline     []func(string) string
 }
 
@@ -25,8 +27,9 @@ type ScrapeResult struct {
 	Error   string `json:"error,omitempty"`
 }
 
-func NewScrape(rewiseDomain bool) *Scrape {
+func NewScrape(headless, rewiseDomain bool) *Scrape {
 	return &Scrape{
+		headless:     headless,
 		rewiseDomain: rewiseDomain,
 	}
 }
@@ -106,7 +109,14 @@ func (s *Scrape) Run(ctx context.Context, rawUrl string) (string, error) {
 		return "", fmt.Errorf("url not allowed: %s", rawUrl)
 	}
 
-	ret, err := s.request(ctx, rawUrl)
+	var ret string
+	var err error
+
+	if s.headless {
+		ret, err = hl.Headless(rawUrl, s.rewiseDomain)
+	} else {
+		ret, err = s.request(ctx, rawUrl)
+	}
 	if err != nil {
 		return "", err
 	}
