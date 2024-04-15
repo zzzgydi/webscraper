@@ -12,7 +12,7 @@ import (
 	"github.com/chromedp/chromedp"
 )
 
-func Headless(rawUrl string, rewiseDomain bool) (string, error) {
+func Headless(rawUrl string, rewiseDomain bool) (string, string, error) {
 	ctx, cancel := chromedp.NewContext(allocCtx)
 	defer cancel()
 
@@ -35,7 +35,7 @@ func Headless(rawUrl string, rewiseDomain bool) (string, error) {
 		),
 	)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	domain := ""
@@ -57,5 +57,10 @@ func Headless(rawUrl string, rewiseDomain bool) (string, error) {
 	}
 
 	converter := md.NewConverter("", true, options)
-	return converter.ConvertString(result["content"].(string))
+	content, err := converter.ConvertString(result["content"].(string))
+	if err != nil {
+		return "", "", err
+	}
+
+	return result["title"].(string), content, nil
 }
