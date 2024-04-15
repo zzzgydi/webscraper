@@ -28,6 +28,7 @@ func InitHttpServer() {
 	}))
 
 	// register routers
+	DemoRouter(r)
 	HealthRouter(r)
 	InnerRouter(r)
 

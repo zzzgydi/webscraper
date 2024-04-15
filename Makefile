@@ -18,5 +18,6 @@ dev: build
 	fi
 
 	cp -r $(HOMEDIR)/config  $(OUTDIR)/
+	cp -r $(HOMEDIR)/static  $(OUTDIR)/
 
 	CONFIG_ENV=dev $(OUTDIR)/$(PROJECTNAME)

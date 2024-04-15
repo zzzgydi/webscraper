@@ -3,3 +3,4 @@ config/*.yaml
 .DS_Store
 output
 *.tar.gz
+web
