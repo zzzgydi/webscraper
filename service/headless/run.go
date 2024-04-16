@@ -2,6 +2,7 @@ package headless
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 	"strings"
 	"time"
@@ -19,7 +20,7 @@ func Headless(rawUrl string, rewiseDomain bool) (string, string, error) {
 	// init
 	_ = chromedp.Run(ctx)
 
-	timeoutCtx, cancel := context.WithTimeout(ctx, 5*time.Second) // 5s
+	timeoutCtx, cancel := context.WithTimeout(ctx, 10*time.Second) // 10s
 	defer cancel()
 
 	var result map[string]any
@@ -57,10 +58,20 @@ func Headless(rawUrl string, rewiseDomain bool) (string, string, error) {
 	}
 
 	converter := md.NewConverter("", true, options)
-	content, err := converter.ConvertString(result["content"].(string))
+	content, ok := result["content"].(string)
+	if !ok {
+		return "", "", fmt.Errorf("content not found")
+	}
+
+	content, err = converter.ConvertString(content)
 	if err != nil {
 		return "", "", err
 	}
 
-	return result["title"].(string), content, nil
+	title, ok := result["title"].(string)
+	if !ok {
+		title = "No Title"
+	}
+
+	return title, content, nil
 }
