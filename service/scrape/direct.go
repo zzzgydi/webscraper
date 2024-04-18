@@ -9,6 +9,7 @@ import (
 
 	md "github.com/JohannesKaufmann/html-to-markdown"
 	"github.com/PuerkitoBio/goquery"
+	"github.com/go-shiori/go-readability"
 	"github.com/zzzgydi/webscraper/common/utils"
 	"golang.org/x/net/html/charset"
 )
@@ -20,8 +21,7 @@ func (s *Scrape) directScrape(ctx context.Context, rawUrl string) (*ScrapeResult
 	}
 
 	headers := map[string]string{
-		"Accept": "text/html;q=0.9, application/xhtml+xml;q=0.8",
-		// "Accept-Encoding":           "gzip, deflate",
+		"Accept":        "text/html;q=0.9, application/xhtml+xml;q=0.8",
 		"Cache-Control": "no-cache",
 		"Connection":    "keep-alive",
 		"Pragma":        "no-cache",
@@ -70,19 +70,20 @@ func (s *Scrape) directScrape(ctx context.Context, rawUrl string) (*ScrapeResult
 		},
 	}
 
-	ret := &ScrapeResult{
-		Url: rawUrl,
-	}
-
-	doc, err := goquery.NewDocumentFromReader(reader)
+	article, err := readability.FromReader(reader, u)
 	if err != nil {
 		return nil, err
 	}
 
-	ret.Title = doc.Find("title").First().Text()
-
 	converter := md.NewConverter("", true, options)
-	ret.Content = converter.Convert(doc.Selection)
+	content, err := converter.ConvertString(article.Content)
+	if err != nil {
+		return nil, err
+	}
 
-	return ret, nil
+	return &ScrapeResult{
+		Url:     rawUrl,
+		Title:   article.Title,
+		Content: content,
+	}, nil
 }
