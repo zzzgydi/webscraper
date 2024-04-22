@@ -18,11 +18,38 @@ Open the following URL in the browser:
 http://127.0.0.1:4090?u=https://github.com/zzzgydi/webscraper
 ```
 
+use HTTP GET mode:
+
+```
+http://127.0.0.1:4090?u=https://github.com/zzzgydi/webscraper&headless=false
+```
+
+use HTTP GET mode and disable readability:
+
+```
+http://127.0.0.1:4090?u=https://github.com/zzzgydi/webscraper&headless=false&readability=false
+```
+
 OR you can use it with curl:
+
+#### POST /v1/scrape
+
+Scrapes the webpage and returns the result in Markdown format.
+
+Request Body
+
+| Parameter   | Type    | Description                                       |
+| ----------- | ------- | ------------------------------------------------- |
+| url_list    | array   | List of URLs to scrape                            |
+| headless    | boolean | (Optional) Whether to run in headless mode        |
+| readability | boolean | (Optional) Whether to enhance readability of HTML |
+
+Example Request:
 
 ```bash
 curl -X POST -H "Content-Type: application/json" \
-     -d '{"url_list":["https://google.com"]}' http://127.0.0.1:4090/v1/scrape
+     -d '{"url_list":["https://google.com"], "headless": false, "readability": false}' \
+     http://127.0.0.1:4090/v1/scrape
 ```
 
 This will start the server and output logs to the `output/log` directory.
