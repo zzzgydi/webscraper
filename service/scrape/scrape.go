@@ -9,12 +9,14 @@ import (
 type Scrape struct {
 	rewiseDomain bool
 	headless     bool
+	readability  bool
 	pipeline     []func(string) string
 }
 
-func NewScrape(headless, rewiseDomain bool) *Scrape {
+func NewScrape(headless, readability, rewiseDomain bool) *Scrape {
 	return &Scrape{
 		headless:     headless,
+		readability:  readability,
 		rewiseDomain: rewiseDomain,
 	}
 }

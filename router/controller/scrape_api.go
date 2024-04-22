@@ -23,7 +23,12 @@ func PostScrape(c *gin.Context) {
 		headless = *req.Headless
 	}
 
-	s := scrape.NewScrape(headless, true)
+	readability := true
+	if req.Readability != nil {
+		readability = *req.Readability
+	}
+
+	s := scrape.NewScrape(headless, readability, true)
 	res, err := s.BatchRun(c.Request.Context(), req.UrlList)
 	if err != nil {
 		ReturnServerError(c, err)

@@ -11,6 +11,7 @@ import (
 func GetScrapeHTML(c *gin.Context) {
 	urlParam := c.Query("u")
 	noHeadless := c.Query("headless") == "false"
+	noReadability := c.Query("readability") == "false"
 
 	if urlParam == "" {
 		c.Redirect(http.StatusFound, "https://github.com/zzzgydi/webscraper")
@@ -22,7 +23,7 @@ func GetScrapeHTML(c *gin.Context) {
 		trace.Trace("url", urlParam)
 	}
 
-	s := scrape.NewScrape(!noHeadless, true)
+	s := scrape.NewScrape(!noHeadless, !noReadability, true)
 	res, err := s.Run(c.Request.Context(), urlParam)
 	if err != nil {
 		c.HTML(http.StatusOK, "error.html", gin.H{

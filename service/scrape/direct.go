@@ -70,20 +70,42 @@ func (s *Scrape) directScrape(ctx context.Context, rawUrl string) (*ScrapeResult
 		},
 	}
 
-	article, err := readability.FromReader(reader, u)
-	if err != nil {
-		return nil, err
-	}
+	if s.readability {
+		article, err := readability.FromReader(reader, u)
+		if err != nil {
+			return nil, err
+		}
 
-	converter := md.NewConverter("", true, options)
-	content, err := converter.ConvertString(article.Content)
-	if err != nil {
-		return nil, err
-	}
+		converter := md.NewConverter("", true, options)
+		content, err := converter.ConvertString(article.Content)
+		if err != nil {
+			return nil, err
+		}
 
-	return &ScrapeResult{
-		Url:     rawUrl,
-		Title:   article.Title,
-		Content: content,
-	}, nil
+		return &ScrapeResult{
+			Url:     rawUrl,
+			Title:   article.Title,
+			Content: content,
+		}, nil
+	} else {
+		doc, err := goquery.NewDocumentFromReader(reader)
+		if err != nil {
+			return nil, err
+		}
+
+		converter := md.NewConverter("", true, options)
+		content := converter.Convert(doc.Selection)
+
+		title := ""
+		titleSelect := doc.Find("title")
+		if titleSelect != nil {
+			title = titleSelect.Text()
+		}
+
+		return &ScrapeResult{
+			Url:     rawUrl,
+			Title:   title,
+			Content: content,
+		}, nil
+	}
 }

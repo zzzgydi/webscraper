@@ -13,7 +13,7 @@ import (
 	"github.com/chromedp/chromedp"
 )
 
-func Headless(rawUrl string, rewiseDomain bool) (string, string, error) {
+func Headless(rawUrl string, readability, rewiseDomain bool) (string, string, error) {
 	ctx, cancel := chromedp.NewContext(allocCtx)
 	defer cancel()
 
@@ -25,10 +25,15 @@ func Headless(rawUrl string, rewiseDomain bool) (string, string, error) {
 
 	var result map[string]any
 
+	script := "(function __webscraper__(){return {title: document.title, content: document.documentElement.outerHTML};})();"
+	if readability {
+		script = readabilityJS + ";new Readability(document.cloneNode(true)).parse();"
+	}
+
 	err := chromedp.Run(timeoutCtx,
 		chromedp.Navigate(rawUrl),
 		chromedp.Evaluate(
-			readabilityJS+`;new Readability(document.cloneNode(true)).parse()`,
+			script,
 			&result,
 			func(p *runtime.EvaluateParams) *runtime.EvaluateParams {
 				return p.WithAwaitPromise(true)
@@ -70,7 +75,7 @@ func Headless(rawUrl string, rewiseDomain bool) (string, string, error) {
 
 	title, ok := result["title"].(string)
 	if !ok {
-		title = "No Title"
+		title = ""
 	}
 
 	return title, content, nil
