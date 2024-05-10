@@ -4,7 +4,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func HealthRouter(r *gin.Engine) {
+func init() {
+	RegisterRoute(func(r *gin.Engine) {
+		healthRouter(r)
+	})
+}
+
+func healthRouter(r *gin.Engine) {
 	r.GET("/health", func(c *gin.Context) {
 		c.String(200, "ok")
 	})

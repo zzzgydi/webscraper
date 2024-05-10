@@ -12,6 +12,19 @@ import (
 	L "github.com/zzzgydi/webscraper/common/logger"
 )
 
+var registry []func(*gin.Engine)
+
+// RegisterRoute Register router api
+func RegisterRoute(registerFunc func(*gin.Engine)) {
+	registry = append(registry, registerFunc)
+}
+
+func initRoutes(r *gin.Engine) {
+	for _, register := range registry {
+		register(r)
+	}
+}
+
 func InitHttpServer() {
 	r := gin.New()
 	r.Use(gin.Recovery())
@@ -28,9 +41,7 @@ func InitHttpServer() {
 	}))
 
 	// register routers
-	DemoRouter(r)
-	HealthRouter(r)
-	InnerRouter(r)
+	initRoutes(r)
 
 	logger := slog.NewLogLogger(L.Handler, slog.LevelError)
 	srv := &http.Server{
