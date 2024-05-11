@@ -7,51 +7,46 @@ import (
 	"github.com/zzzgydi/webscraper/router/utils"
 )
 
+// Code
 const (
-	SUCCESS      int = 0
-	BAD_REQUEST  int = 400
-	SERVER_ERROR int = 500
+	CodeSuccess     int = 0
+	CodeBadRequest  int = 400
+	CodeServerError int = 500
 )
 
-type ObjectResponse struct {
+// Msg
+const (
+	MsgSuccess = "ok"
+	MsgFailed  = "failed"
+)
+
+type CommonResponse struct {
 	Code int    `json:"code"`
 	Msg  string `json:"msg"`
 	Data any    `json:"data,omitempty"`
 }
 
-func ReturnSuccess(c *gin.Context, data any) {
+func returnResponse(c *gin.Context, code int, msg string, data any) {
 	if trace := utils.GetTraceLogger(c); trace != nil {
-		trace.BizCode = SUCCESS
-		trace.BizMsg = "ok"
+		trace.BizCode = code
+		trace.BizMsg = msg
 	}
 
-	c.JSON(http.StatusOK, &ObjectResponse{
-		Code: SUCCESS,
-		Msg:  "ok",
+	c.JSON(http.StatusOK, &CommonResponse{
+		Code: code,
+		Msg:  msg,
 		Data: data,
 	})
 }
 
-func ReturnServerError(c *gin.Context, err error) {
-	if trace := utils.GetTraceLogger(c); trace != nil {
-		trace.BizCode = SERVER_ERROR
-		trace.BizMsg = err.Error()
-	}
+func ReturnSuccess(c *gin.Context, data any) {
+	returnResponse(c, CodeSuccess, MsgSuccess, data)
+}
 
-	c.JSON(http.StatusOK, &ObjectResponse{
-		Code: SERVER_ERROR,
-		Msg:  err.Error(),
-	})
+func ReturnServerError(c *gin.Context, err error) {
+	returnResponse(c, CodeServerError, err.Error(), nil)
 }
 
 func ReturnBadRequest(c *gin.Context, err error) {
-	if trace := utils.GetTraceLogger(c); trace != nil {
-		trace.BizCode = BAD_REQUEST
-		trace.BizMsg = err.Error()
-	}
-
-	c.JSON(http.StatusOK, &ObjectResponse{
-		Code: BAD_REQUEST,
-		Msg:  err.Error(),
-	})
+	returnResponse(c, CodeBadRequest, err.Error(), nil)
 }
